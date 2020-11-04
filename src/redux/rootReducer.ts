@@ -1,10 +1,5 @@
-import {
-    openCell as openCellAction,
-    labelCell as labelCellAction,
-    showAllBombs as showAllBombsAction,
-    restartGame as restartGameAction,
-} from "./actions";
 import {CHANGE_GAME_LEVEL, LABEL_CELL, OPEN_CELL, RESTART_GAME, SHOW_ALL_BOMBS} from "./utilities";
+import {Action, ICell, IState} from "./types";
 
 let boardDimension: number;
 export const easyLevel = 'easy';
@@ -14,18 +9,8 @@ export const hardLevel = 'hard';
 const generateRandomNumber = (max: number): number =>
     Math.floor(Math.random() * max);
 
-export interface ICell {
-    isBomb: boolean,
-    isOpen: boolean,
-    bombCount: number | null,
-    isFlagged: boolean,
-    isQuestioned: boolean,
-    rowIndex: number,
-    columnIndex: number
-}
-
-function setupBomb(freeCells: Array<ICell>): void {
-    let randomNumber = generateRandomNumber(freeCells.length - 1);
+function setupBomb(freeCells: ICell[]): void {
+    const randomNumber = generateRandomNumber(freeCells.length - 1);
     freeCells[randomNumber].isBomb = true;
     freeCells.splice(randomNumber, 1);
 }
@@ -42,11 +27,11 @@ function defineBoardDimension(gameLevel: string): number {
     throw new Error('Unexpected gameLevel value.');
 }
 
-function createBoard(gameLevel: string): Array<Array<ICell>> {
+function createBoard(gameLevel: string): ICell[][] {
     boardDimension = defineBoardDimension(gameLevel);
 
-    const board: Array<Array<ICell>> = [];
-    const freeCells: Array<ICell> = [];
+    const board: ICell[][] = [];
+    const freeCells: ICell[] = [];
 
     for (let rowIndex = 0; rowIndex <= boardDimension - 1; rowIndex++) {
         board[rowIndex] = [];
@@ -77,7 +62,7 @@ const createState = (gameLevel: string): IState => ({
     gameLevel
 });
 
-function checkCellIsValid(board: Array<Array<ICell>>, rowIndex: number, columnIndex: number): boolean {
+function checkCellIsValid(board: ICell[][], rowIndex: number, columnIndex: number): boolean {
     const rowLength = board.length;
     const columnLength = board[0].length;
     return rowIndex >= 0 &&
@@ -86,12 +71,12 @@ function checkCellIsValid(board: Array<Array<ICell>>, rowIndex: number, columnIn
         columnIndex < columnLength;
 }
 
-function checkHasBomb(board: Array<Array<ICell>>, rowIndex: number, columnIndex: number): boolean {
+function checkHasBomb(board: ICell[][], rowIndex: number, columnIndex: number): boolean {
     return checkCellIsValid(board, rowIndex, columnIndex) &&
         board[rowIndex][columnIndex].isBomb;
 }
 
-function calculateBombCount(board: Array<Array<ICell>>, rowIndex: number, columnIndex: number): number {
+function calculateBombCount(board: ICell[][], rowIndex: number, columnIndex: number): number {
     let bombCounter = 0;
     for (let rowIndexAdjustment = -1; rowIndexAdjustment <= 1; rowIndexAdjustment++) {
         for (let columnIndexAdjustment = -1; columnIndexAdjustment <= 1; columnIndexAdjustment++) {
@@ -104,7 +89,7 @@ function calculateBombCount(board: Array<Array<ICell>>, rowIndex: number, column
     return bombCounter;
 }
 
-function showAllBombs(board: Array<Array<ICell>>): void {
+function showAllBombs(board: ICell[][]): void {
     for (let rowIndex = 0; rowIndex < board.length; rowIndex++) {
         for (let columnIndex = 0; columnIndex < board[rowIndex].length; columnIndex++) {
             if (board[rowIndex][columnIndex].isBomb)
@@ -113,14 +98,14 @@ function showAllBombs(board: Array<Array<ICell>>): void {
     }
 }
 
-export function countCells(board: Array<Array<ICell>>, cellChecker: (cell: ICell) => boolean): number {
+function countCells(board: ICell[][], cellChecker: (cell: ICell) => boolean): number {
     return board
         .map(row => row.reduce((acc, cell) => cellChecker(cell) ? acc + 1 : acc, 0))
         .reduce((acc, rowCellCount) => acc + rowCellCount);
 }
 
-export function calculateNotMinedCells(board: Array<Array<ICell>>): number {
-    const boardDimension = board.length;
+export function calculateNotMinedCells(board: ICell[][]): number {
+    boardDimension = board.length;
     const allCellCount = boardDimension * boardDimension;
     const openNotMinedCellCount = countCells(board, cell => cell.isOpen && !cell.isBomb);
 
@@ -159,13 +144,13 @@ function openCell(state: IState, rowIndex: number, columnIndex: number): void {
     }
 }
 
-const copyBoard = (board: Array<Array<ICell>>): Array<Array<ICell>> =>
+const copyBoard = (board: ICell[][]): ICell[][] =>
     board.map(row => row.map(column => column));
 
-export const calculateFlaggedCells = (board: Array<Array<ICell>>): number =>
+export const calculateFlaggedCells = (board: ICell[][]): number =>
     countCells(board, cell => cell.isFlagged);
 
-function labelCell(cell: ICell, board: Array<Array<ICell>>): void {
+function labelCell(cell: ICell, board: ICell[][]): void {
     const flaggedCells = calculateFlaggedCells(board);
 
     if (cell.isFlagged) {
@@ -178,14 +163,6 @@ function labelCell(cell: ICell, board: Array<Array<ICell>>): void {
     } else if (flaggedCells === boardDimension) {
         cell.isQuestioned = true;
     }
-}
-
-type Action = ReturnType<typeof openCellAction | typeof labelCellAction | typeof showAllBombsAction | typeof restartGameAction>;
-
-export interface IState {
-    board: any,
-    isGameEnded: boolean,
-    gameLevel: string
 }
 
 export const rootReducer = (state: IState = createState(easyLevel), action: Action): IState => {

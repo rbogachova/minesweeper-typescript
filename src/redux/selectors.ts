@@ -1,5 +1,6 @@
 import {createSelector} from 'reselect';
-import {calculateNotMinedCells, calculateFlaggedCells, IState} from './rootReducer';
+import {calculateNotMinedCells, calculateFlaggedCells} from './rootReducer';
+import {IState} from "./types";
 
 const selectBoard = (state: IState) => state.board;
 

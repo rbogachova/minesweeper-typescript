@@ -2,22 +2,23 @@ import React from 'react';
 import {connect} from "react-redux";
 import Cell from './Cell';
 import {v4 as uuidv4} from 'uuid';
-import {restartGame, showAllBombs, changeGameLevel} from './redux/actions';
+import {createRestartGame, createShowAllBombs, createChangeGameLevel} from './redux/actions';
 import './app.css';
 import {Alert} from 'antd';
 import {selectFlaggedCells, selectNotMinedCells} from './redux/selectors';
-import {easyLevel, hardLevel, ICell, IState, mediumLevel} from './redux/rootReducer';
+import {easyLevel, hardLevel, mediumLevel} from './redux/rootReducer';
+import {ICell, IState} from "./redux/types";
 
 const renderCell = (cell: ICell): JSX.Element =>
     <Cell key={uuidv4()} cell={cell}/>;
 
-const renderRow = (row: Array<ICell>): JSX.Element =>
+const renderRow = (row: ICell[]): JSX.Element =>
     <div key={uuidv4()}>{row.map(renderCell)}</div>;
 
 type Props = ReturnType<typeof mapStateToProps> & typeof mapDispatchToProps;
 
 const App: React.FC<Props> = (props) => {
-    const changeGameLevel = (e:  React.FormEvent<HTMLSelectElement>) =>
+    const changeGameLevel = (e: React.FormEvent<HTMLSelectElement>) =>
         props.changeGameLevel(e.currentTarget.value);
 
     const restart = () =>
@@ -76,9 +77,9 @@ const mapStateToProps = (state: IState) => ({
 });
 
 const mapDispatchToProps = {
-    restartGame,
-    showAllBombs,
-    changeGameLevel
+    restartGame: createRestartGame,
+    showAllBombs: createShowAllBombs,
+    changeGameLevel: createChangeGameLevel
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

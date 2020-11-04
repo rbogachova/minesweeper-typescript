@@ -1,9 +1,9 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {openCell, labelCell} from './redux/actions';
+import {createOpenCell, createLabelCell} from './redux/actions';
 import './cell.css';
 import 'antd/dist/antd.css';
-import {ICell, IState} from "./redux/rootReducer";
+import {ICell, IState} from "./redux/types";
 
 type Props = ReturnType<typeof mapStateToProps> & typeof mapDispatchToProps & { cell: ICell };
 
@@ -55,8 +55,8 @@ const mapStateToProps = (state: IState) => ({
 });
 
 const mapDispatchToProps = {
-    openCell,
-    labelCell
+    openCell: createOpenCell,
+    labelCell: createLabelCell
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cell);
