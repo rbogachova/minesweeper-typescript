@@ -1,4 +1,10 @@
-import {CHANGE_GAME_LEVEL, LABEL_CELL, OPEN_CELL, RESTART_GAME, SHOW_ALL_BOMBS, typedAction} from "./utilities";
+import {typedAction} from "./utilities";
+
+export const OPEN_CELL = 'OPEN_CELL';
+export const LABEL_CELL = 'LABEL_CELL';
+export const SHOW_ALL_BOMBS = 'SHOW_ALL_BOMBS';
+export const RESTART_GAME = 'RESTART_GAME';
+export const CHANGE_GAME_LEVEL = 'CHANGE_GAME_LEVEL';
 
 export const createOpenCell = (rowIndex: number, columnIndex: number) => {
     return typedAction(OPEN_CELL, {rowIndex, columnIndex});

@@ -1,4 +1,4 @@
-import {CHANGE_GAME_LEVEL, LABEL_CELL, OPEN_CELL, RESTART_GAME, SHOW_ALL_BOMBS} from "./utilities";
+import {CHANGE_GAME_LEVEL, LABEL_CELL, OPEN_CELL, RESTART_GAME, SHOW_ALL_BOMBS} from "./actions";
 import {Action, ICell, IState} from "./types";
 
 let boardDimension: number;
